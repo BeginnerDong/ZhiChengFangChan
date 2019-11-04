@@ -1,0 +1,12 @@
+
+/* 商品列表 */
+.proList{padding: 0 5.8%;flex-wrap: wrap;}
+.proList .item-lis{ width: 300rpx; overflow: hidden;box-shadow: 0 0 10rpx rgba(0,0,0,0.1);background: #fff;margin-top: 30rpx; position: relative;border-radius: 8rpx;}
+.proList .item-lis .img{width: 100%;height: 214rpx;display: block;margin: 0 auto;}
+.proList .item-lis .infor{padding: 20rpx 4%;}
+.proList .item-lis .text2{width: 50%;}
+.proList .item-lis .tit{ font-size: 26rpx; line-height: 32rpx; margin-bottom: 10rpx;}
+.proList .item-lis .money{font-size: 26rpx;color: red; width: 50%;}
+.proList .item-lis .money:after{content: '元/月'; font-size: 22rpx;}
+
+
