@@ -2,20 +2,17 @@
 	<view>
 		
 		<view class="mglr4 pdtb15">
-			<view class="font16">长安区高效聚集，使其成为西安人居环境最好的区域之一。</view>
+			<view class="font16">{{mainData.title}}</view>
 			<view class="color9 lable font12 pdt10 flex">
 				<view class="">来源：智诚房产</view>
-				<view class="data">发布时间：2019-11-04</view>
+				<view class="data">发布时间：{{mainData.create_time}}</view>
 			</view>
 		</view>
 		<view class="">
-			<image style="width: 100%; height: 330rpx;" src="../../static/images/details-banner.png" mode=""></image>
+			<image style="width: 100%; height: 330rpx;" :src="mainData.mainImg&&mainData.mainImg[0]?mainData.mainImg[0].url:''" mode=""></image>
 		</view>
 		<view class="xqInfor">
-			<view class="cont">
-				<view>房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况。</view>
-				<view>房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况。</view>
-				<view>房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况。</view>
+			<view class="content ql-editor" v-html="mainData.content">
 			</view>
 		</view>
 	</view>
@@ -25,26 +22,43 @@
 	export default {
 		data() {
 			return {
-				Router:this.$Router,
-				showView: false,
-				wx_info:{}
+				Router: this.$Router,
+
+
+				mainData: {}
 			}
 		},
-		
+
 		onLoad(options) {
 			const self = this;
-			// self.$Utils.loadAll(['getMainData'], self);
+			self.id = options.id;
+			self.$Utils.loadAll(['getMainData'], self);
 		},
+
 		methods: {
+
 			getMainData() {
 				const self = this;
 				console.log('852369')
 				const postData = {};
-				postData.tokenFuncName = 'getProjectToken';
-				self.$apis.orderGet(postData, callback);
-			}
-		},
-	};
+				postData.searchItem = {
+					id: self.id
+				}
+				const callback = (res) => {
+					if (res.solely_code == 100000 && res.info.data[0]) {
+						self.mainData = res.info.data[0];
+
+						const regex = new RegExp('<img', 'gi');
+						self.mainData.content = self.mainData.content.replace(regex, `<img style="max-width: 100%;"`);
+					} else {
+						self.$Utils.showToast(res.msg, 'none')
+					};
+					self.$Utils.finishFunc('getMainData');
+				};
+				self.$apis.articleGet(postData, callback);
+			},
+		}
+	}
 </script>
 
 <style>

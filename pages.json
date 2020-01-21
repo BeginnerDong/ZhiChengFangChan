@@ -18,7 +18,7 @@
 		{
 			"path": "pages/houseDetail/houseDetail",
 			"style": {
-				"navigationBarTitleText": "尚中心",//设置页面标题文字
+				"navigationBarTitleText": "房源详情",//设置页面标题文字
 				"onReachBottomDistance":100
 			}
 		},
@@ -32,7 +32,7 @@
 		{
 			"path": "pages/newsDetail/newsDetail",
 			"style": {
-				"navigationBarTitleText": "资讯",//设置页面标题文字
+				"navigationBarTitleText": "资讯详情",//设置页面标题文字
 				"onReachBottomDistance":100
 			}
 		},

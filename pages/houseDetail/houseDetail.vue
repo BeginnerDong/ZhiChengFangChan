@@ -1,31 +1,42 @@
 <template>
 	<view>
-		<view class="detailxqBan">
-			<image src="../../static/images/details-banner.png" mode=""></image>
+		<view class="index_topBj">
+			<view class="banner-box">
+				<view class="banner oh">
+					<swiper class="swiper-box" indicator-dots="true" autoplay="true" interval="4000" duration="1000"  indicator-active-color="#fff">
+						<block v-for="(item,index) in mainData.mainImg" :key="index">
+							<swiper-item class="swiper-item">
+								<image  style="width: 100%;"
+								:src="item.url?item.url:''" class="slide-image"/>
+							</swiper-item>
+						</block>
+					</swiper>
+				</view>
+			</view>
 		</view>
 		
-		<view class="font15 pdtb10 borderB1 mglr4">科技路地铁口 尚中心 临近高新一中初中部 周边环境优美 交通便利 商业文化气息浓厚</view>
+		<view class="font15 pdtb10 borderB1 mglr4">{{mainData.title}}</view>
 		
 		<view class="mglr4 pdtb15 detailData center flexRowBetween font13 color6">
 			<view class="item">
-				<view class="number">2400元/月</view>
+				<view class="number">{{mainData.price}}</view>
 				<view>售价</view>
 			</view>
 			<view class="item">
-				<view class="number">2室1厅1卫</view>
+				<view class="number">{{mainData.layout}}</view>
 				<view>房型</view>
 			</view>
 			<view class="item">
-				<view class="number">99㎡</view>
+				<view class="number">{{mainData.area}}㎡</view>
 				<view>面积</view>
 			</view>
 		</view>
 		<view class="borderB1"></view>
 		<view class="detailSpecs flexRowBetween font13">
 			<view class="item pdb5">房间：主卧</view>
-			<view class="item  pdb5">朝向：南北</view>
-			<view class="item">楼层：11层 (共23层)</view>
-			<view class="item">装修：简装</view>
+			<view class="item  pdb5">朝向：{{mainData.direction}}</view>
+			<view class="item">楼层：{{mainData.floor}}</view>
+			<view class="item">装修：{{mainData.decoration}}</view>
 		</view>
 		<view class="f5H10"></view>
 		
@@ -34,9 +45,7 @@
 		</view>
 		
 		<view class="xqInfor">
-			<view class="cont">
-				<view>房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况。</view>
-				<view>房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况房源概况。</view>
+			<view class="content ql-editor" v-html="mainData.content">
 			</view>
 		</view>
 		
@@ -50,26 +59,43 @@
 	export default {
 		data() {
 			return {
-				Router:this.$Router,
-				showView: false,
-				wx_info:{}
+				Router: this.$Router,
+
+
+				mainData: {}
 			}
 		},
-		
+
 		onLoad(options) {
 			const self = this;
-			// self.$Utils.loadAll(['getMainData'], self);
+			self.id = options.id;
+			self.$Utils.loadAll(['getMainData'], self);
 		},
+
 		methods: {
+
 			getMainData() {
 				const self = this;
 				console.log('852369')
 				const postData = {};
-				postData.tokenFuncName = 'getProjectToken';
-				self.$apis.orderGet(postData, callback);
-			}
-		},
-	};
+				postData.searchItem = {
+					id: self.id
+				}
+				const callback = (res) => {
+					if (res.solely_code == 100000 && res.info.data[0]) {
+						self.mainData = res.info.data[0];
+
+						const regex = new RegExp('<img', 'gi');
+						self.mainData.content = self.mainData.content.replace(regex, `<img style="max-width: 100%;"`);
+					} else {
+						self.$Utils.showToast(res.msg, 'none')
+					};
+					self.$Utils.finishFunc('getMainData');
+				};
+				self.$apis.articleGet(postData, callback);
+			},
+		}
+	}
 </script>
 
 <style>

@@ -3,22 +3,23 @@
 		<view class="navLisBox borderB1">
 			<scroll-view class="scrollX" scroll-x>
 				<!-- 点击导航选中当前项 -->
-				<view class="nav-item" :class="curr==index?'on':''"  v-for="(item,index) in classify" :key="index" @click="change(index)">{{item}}</view>
+				<view class="nav-item" :class="curr==item.id?'on':''"  v-for="(item,index) in swiperData" 
+				:key="index" @click="change(item.id)">{{item.title}}</view>
 			</scroll-view>
 		</view>
 		
 		<view class="proList flexRowBetween">
-			<view class="item-lis" v-for="(item,index) in produtList" :key="index" @click="Router.navigateTo({route:{path:'/pages/houseDetail/houseDetail'}})">
+			<view class="item-lis" v-for="(item,index) in mainData" :key="index" 
+			@click="Router.navigateTo({route:{path:'/pages/houseDetail/houseDetail?id='+item.id}})">
 				<view>
-					<image class="img" src="../../static/images/housing-img.png" alt="" />
+					<image class="img" :src="item.mainImg&&item.mainImg[0]?item.mainImg[0].url:''" alt="" />
 				</view>
 				<view class="infor">
-					<view class="tit avoidOverflow">科技路地铁口 尚中心</view>
+					<view class="tit avoidOverflow">{{item.title}}</view>
 					<view class="flexRowBetween font12 ">
-						<view class="color9 font10 text2 avoidOverflow">2室1厅 整租</view>
-						<view class="money flexEnd">2400</view>
+						<view class="color9 font10 text2 avoidOverflow">{{item.layout}}</view>
+						<view class="money flexEnd">{{item.price}}</view>
 					</view>
-					
 				</view>
 			</view>
 		</view>
@@ -64,26 +65,108 @@
 				wx_info:{},
 				classify:['推荐房源','二手房','出租房','新房','厂房','商铺'],
 				produtList:[{},{},{},{},{},{},{},{}],
-				curr:0
+				curr:'',
+				swiperData:[],
+				mainData:[]
 			}
 		},
 		
 		onLoad(options) {
 			const self = this;
-			// self.$Utils.loadAll(['getMainData'], self);
+			if(options.id){
+				console.log(323)
+				self.id = options.id
+			};
+			self.paginate = self.$Utils.cloneForm(self.$AssetsConfig.paginate);
+			self.$Utils.loadAll(['getSliderData'], self);
 		},
+		
+		onReachBottom() {
+			console.log('onReachBottom')
+			const self = this;
+			if (!self.isLoadAll && uni.getStorageSync('loadAllArray')) {
+				self.paginate.currentPage++;
+				self.getMainData()
+			};
+		},
+		
+		
 		methods: {
-			change(index){
+			
+			change(id){
 				const self = this;
-				self.curr = index
+				self.curr = id;
+				self.getMainData(true);
 			},
-			getMainData() {
+			
+			getMainData(isNew) {
 				const self = this;
-				console.log('852369')
+				if (isNew) {
+					self.mainData = [];
+					self.paginate = {
+						count: 0,
+						currentPage: 1,
+						is_page: true,
+						pagesize: 5
+					}
+				};
 				const postData = {};
-				postData.tokenFuncName = 'getProjectToken';
-				self.$apis.orderGet(postData, callback);
-			}
+				postData.paginate = self.$Utils.cloneForm(self.paginate);
+				postData.searchItem = {
+					thirdapp_id: 2,
+					menu_id: self.curr,
+				};
+				postData.order = {
+					listorder:'desc'
+				};
+				const callback = (res) => {
+					if (res.info.data.length > 0) {
+						self.mainData.push.apply(self.mainData, res.info.data);
+					}
+					console.log('self.mainData', self.mainData)
+					self.$Utils.finishFunc('getMainData');
+				};
+				self.$apis.articleGet(postData, callback);
+			},
+			
+			getSliderData() {
+				const self = this;
+				const postData = {};
+				postData.searchItem = {
+					thirdapp_id: 2,
+				};
+				postData.getBefore = {
+					caseData: {
+						tableName: 'Label',
+						searchItem: {
+							title: ['=', ['房屋类型']],
+						},
+						middleKey: 'parentid',
+						key: 'id',
+						condition: 'in',
+					},
+				};
+				postData.order = {
+					listorder:'desc'
+				};
+				const callback = (res) => {
+					if (res.info.data.length > 0) {
+						self.swiperData.push.apply(self.swiperData, res.info.data);
+						if(self.id){
+							self.curr = self.id
+						}else{
+							self.curr = self.swiperData[0].id;
+						}
+						
+						self.getMainData()
+					}
+					console.log('self.swiperData', self.swiperData)
+					self.$Utils.finishFunc('getSliderData');
+				};
+				self.$apis.labelGet(postData, callback);
+			},
+			
+			
 		},
 	};
 </script>

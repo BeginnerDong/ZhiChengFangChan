@@ -17,6 +17,19 @@ export default {
 		};
 		http.HTTP(allParams);
 	},
+	
+	JustaddMessage: function(param, callback) {
+	
+		var allParams = {
+			url: 'Project/Solely/addMessage',
+			type: 'post',
+			data: param,
+			sCallback: function(data) {
+				callback && callback(data);
+			}
+		};
+		http.HTTP(allParams);
+	},
 
 	registerSuper(param, callback) {
 
